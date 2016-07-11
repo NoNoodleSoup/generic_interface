@@ -1,16 +1,18 @@
 <h1>
-    ui-wrapper works!
+    ui-wrapper testing...
 </h1>
 
 <div class="fieldset">
-    <vaadin-combo-box label="Tables" [items]="tableNames" [(value)]="selectedTable"
-    (selected-item-changed)="test($event.detail.value)"></vaadin-combo-box>
+    <vaadin-combo-box #vcb label="Tables" [items]="tableNames" [(value)]="selectedTable"
+    (selected-item-changed)="onSelection($event.detail.value)"></vaadin-combo-box>
 </div>
 
 <div style="margin-top: 40px;">
     <h3>{{selectedTable ? "The currently selected table is: " + selectedTable : "No Table Selected"}}</h3>
 </div>
 
-<div style="margin-top: 40px;" *ngIf="entities">
-    <h3>The currently selected entity is: {{entity}}</h3>
+<div style="margin-top: 40px;" *ngIf="entityName">
+    <h3>The currently selected entity is: {{tableMetadata[vcb.value].Name}}</h3>
 </div>
+
+<query [entityDescription]="entityName"></query>

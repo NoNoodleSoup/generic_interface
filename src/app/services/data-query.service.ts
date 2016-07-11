@@ -14,7 +14,7 @@ export class DataQueryService {
             .catch(this.handleError);
     }
 
-    getEntities(entity: string) {
+    getEntity(entity: string) {
         return this.apiCallService.getEntity(entity).map(res => res.json())
             .catch(this.handleError);
     }
