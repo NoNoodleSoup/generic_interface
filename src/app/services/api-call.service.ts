@@ -16,4 +16,8 @@ export class ApiCallService {
     return this.http.get(this.apiBaseUrl + 'MetaData/GetContextMetaData?details=' + details)
   }
 
+  getEntity(entity: string): Observable<Response> {
+    return this.http.get(this.apiBaseUrl + 'MetaData/GetEntityMetaData/' + entity)
+  }
+
 }

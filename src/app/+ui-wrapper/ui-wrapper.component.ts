@@ -18,15 +18,29 @@ export class UiWrapperComponent implements OnInit {
 
   constructor(private dataQueryService: DataQueryService) { }
 
-  tables: string[];
+  tableMetadata: any;
+  tableNames: string[];
+  entityName: string;
   errorMessage: any;
   selectedTable: string;
 
   ngOnInit() {
-    this.dataQueryService.getTables().subscribe(
-      data => this.tables = Object.keys(data),
+    this.dataQueryService.getTables(true).subscribe(
+      data => { this.tableMetadata = data, this.tableNames = Object.keys(data) },
       error => this.errorMessage = <any>error
     );
   }
 
+  testQuery(entity: string) {
+    this.dataQueryService.getEntities(entity).subscribe(
+      data => this.entityName = Object.keys(data)[0],
+      error => this.errorMessage = <any>error
+    )
+  }
+
+  test(value) {
+    this.testQuery(this.tableMetadata[value].Name);
+    console.log("The Currently selected table is: " + value);
+    console.log("The Currently selected entity is: " + this.tableMetadata[value].Name);
+  }
 }

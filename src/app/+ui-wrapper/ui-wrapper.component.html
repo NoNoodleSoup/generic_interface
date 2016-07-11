@@ -3,9 +3,14 @@
 </h1>
 
 <div class="fieldset">
-    <vaadin-combo-box label="Tables" [items]="tables" [(value)]="selectedTable"></vaadin-combo-box>
+    <vaadin-combo-box label="Tables" [items]="tableNames" [(value)]="selectedTable"
+    (selected-item-changed)="test($event.detail.value)"></vaadin-combo-box>
 </div>
 
 <div style="margin-top: 40px;">
-    <h3>{{selectedTable ? "The current selected table is: " + selectedTable : "No Table Selected"}}</h3>
+    <h3>{{selectedTable ? "The currently selected table is: " + selectedTable : "No Table Selected"}}</h3>
+</div>
+
+<div style="margin-top: 40px;" *ngIf="entities">
+    <h3>The currently selected entity is: {{entity}}</h3>
 </div>

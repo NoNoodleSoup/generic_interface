@@ -9,10 +9,16 @@ export class DataQueryService {
 
     constructor(private apiCallService: ApiCallService) { }
 
-    getTables() {
-        return this.apiCallService.getContext().map(res => res.json().TableDictionary)
+    getTables(details: boolean) {
+        return this.apiCallService.getContext(details).map(res => res.json().TableDictionary)
             .catch(this.handleError);
     }
+
+    getEntities(entity: string) {
+        return this.apiCallService.getEntity(entity).map(res => res.json())
+            .catch(this.handleError);
+    }
+
 
     private handleError(error: any) {
         let errMsg = (error.message) ? error.message :
