@@ -22,24 +22,24 @@ export class UiWrapperComponent implements OnInit {
 
   tableMetadata: any;
   tableNames: string[];
-  entityName: any;
+  entityDescription: any;
   errorMessage: any;
   selectedTable: string;
 
   ngOnInit() {
     this.dataQueryService.getTables(true).subscribe(
-      data => { this.tableMetadata = data, this.tableNames = Object.keys(data)},
+      data => { this.tableMetadata = data, this.tableNames = Object.keys(data) },
       error => this.errorMessage = <any>error
     );
   }
 
   getEntity(entity: string) {
     this.dataQueryService.getEntity(entity).subscribe(
-      data => this.entityName = data[entity].Description,
+      data => this.entityDescription = data[entity].Description,
       error => this.errorMessage = <any>error
     )
   }
-  
+
   onSelection(value) {
     this.getEntity(this.tableMetadata[value].Name);
     console.log("The Currently selected table is: " + value);
