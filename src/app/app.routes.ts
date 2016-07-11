@@ -1,5 +1,7 @@
 import { provideRouter, RouterConfig } from '@angular/router';
 
+import './rxjs-operators';
+
 import { UiWrapperComponent } from './+ui-wrapper';
 
 export const routes: RouterConfig = [

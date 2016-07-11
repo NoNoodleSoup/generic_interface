@@ -7,10 +7,12 @@
  **********************************************************************************************/
 /** Map relative paths to URLs. */
 const map: any = {
+  '@vaadin': 'vendor/@vaadin'
 };
 
 /** User packages configuration. */
 const packages: any = {
+  '@vaadin/angular2-polymer': { main: 'index.js', defaultExtension: 'js' }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,9 +36,8 @@ const barrels: string[] = [
   // App specific barrels.
   'app',
   'app/shared',
-  'app/+ui-wrapper/ui-wrapper',
   'app/+ui-wrapper',
-  'app/ui-wrapper',
+  'app/services'
   /** @cli-barrel */
 ];
 

@@ -1,3 +1,11 @@
 <h1>
-  ui-wrapper works!
+    ui-wrapper works!
 </h1>
+
+<div class="fieldset">
+    <vaadin-combo-box label="Tables" [items]="tables" [(value)]="selectedTable"></vaadin-combo-box>
+</div>
+
+<div style="margin-top: 40px;">
+    <h3>{{selectedTable ? "The current selected table is: " + selectedTable : "No Table Selected"}}</h3>
+</div>

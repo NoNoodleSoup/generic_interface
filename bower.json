@@ -1,0 +1,21 @@
+{
+  "name": "Dox Generic Interface",
+  "description": "Generic Interface for Dox data",
+  "main": "",
+  "authors": [
+    "Seth Pearson"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/NoNoodleSoup/generic_interface",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "paper-elements": "^1.0.7",
+    "vaadin-combo-box": "^1.1.1"
+  }
+}
