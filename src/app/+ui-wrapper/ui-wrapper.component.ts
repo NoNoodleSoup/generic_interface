@@ -27,7 +27,7 @@ export class UiWrapperComponent implements OnInit {
   selectedTable: string;
 
   ngOnInit() {
-    this.dataQueryService.getTables(true).subscribe(
+    this.dataQueryService.getTables().subscribe(
       data => { this.tableMetadata = data, this.tableNames = Object.keys(data) },
       error => this.errorMessage = <any>error
     );
@@ -37,7 +37,7 @@ export class UiWrapperComponent implements OnInit {
     this.dataQueryService.getEntity(entity).subscribe(
       data => this.entityDescription = data[entity].Description,
       error => this.errorMessage = <any>error
-    )
+    );
   }
 
   onSelection(value) {

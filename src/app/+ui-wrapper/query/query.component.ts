@@ -7,7 +7,7 @@ import { Component, Input, OnInit } from '@angular/core';
   styleUrls: ['query.component.css']
 })
 export class QueryComponent implements OnInit {
-@Input('entity') entityDescription;
+@Input('description') entityDescription;
   constructor() {}
 
   ngOnInit() {
