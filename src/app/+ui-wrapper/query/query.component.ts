@@ -7,8 +7,20 @@ import { Component, Input, OnInit } from '@angular/core';
   styleUrls: ['query.component.css']
 })
 export class QueryComponent implements OnInit {
-@Input('description') entityDescription;
-  constructor() {}
+
+  @Input() entityObj: Object = {};
+  name: string;
+
+  constructor() { }
+
+  getName() {
+    console.log(this.entityObj);
+  }
+
+  ngOnChanges(){
+    // this.name = Object.keys(this.entityObj)[0];
+    // console.log(name);
+  }
 
   ngOnInit() {
   }

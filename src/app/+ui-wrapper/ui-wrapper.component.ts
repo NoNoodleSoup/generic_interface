@@ -1,9 +1,12 @@
-import { Component, OnInit, SimpleChange, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { PolymerElement } from '@vaadin/angular2-polymer';
 
 import { DataQueryService } from '../services';
 import { QueryComponent } from './query';
+import { MapToIterable } from '../shared';
+import { Entity } from '../models'
+
 
 @Component({
   moduleId: module.id,
@@ -14,35 +17,36 @@ import { QueryComponent } from './query';
     PolymerElement('vaadin-combo-box'),
     PolymerElement('paper-input'),
     QueryComponent
-  ]
+  ],
+  pipes: [MapToIterable]
 })
 export class UiWrapperComponent implements OnInit {
 
   constructor(private dataQueryService: DataQueryService) { }
 
-  tableMetadata: any;
-  tableNames: string[];
-  entityDescription: any;
+  tableNames: any;
   errorMessage: any;
-  selectedTable: string;
+  selectedItem: Object;
+  selectedEntity: any;
+  value: string;
 
   ngOnInit() {
-    this.dataQueryService.getTables().subscribe(
-      data => { this.tableMetadata = data, this.tableNames = Object.keys(data) },
+    this.dataQueryService.dbTables$.subscribe(
+      data => this.tableNames = data,
       error => this.errorMessage = <any>error
     );
-  }
-
-  getEntity(entity: string) {
-    this.dataQueryService.getEntity(entity).subscribe(
-      data => this.entityDescription = data[entity].Description,
+    this.dataQueryService.entity$.subscribe(
+      data => {
+        this.selectedEntity = data;
+      },
       error => this.errorMessage = <any>error
     );
+
   }
 
-  onSelection(value) {
-    this.getEntity(this.tableMetadata[value].Name);
-    console.log("The Currently selected table is: " + value);
-    console.log("The Currently selected entity is: " + this.tableMetadata[value].Name);
+  getNewEntity(entityName) {
+    if (entityName) {
+      this.dataQueryService.getEntityMetaData(entityName.entity);
+    }
   }
 }
