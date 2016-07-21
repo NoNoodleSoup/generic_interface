@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 
 import { PolymerElement } from '@vaadin/angular2-polymer';
+import { MdCard } from '@angular2-material/card';
 
 import { DataQueryService } from '../services';
+import { DbTable, Entity } from '../models'
+import { UiWrapperService } from './shared';
 import { QueryComponent } from './query';
-import { MapToIterable } from '../shared';
-import { Entity } from '../models'
 
 
 @Component({
@@ -14,37 +15,36 @@ import { Entity } from '../models'
   templateUrl: 'ui-wrapper.component.html',
   styleUrls: ['ui-wrapper.component.css'],
   directives: [
+    MdCard,
     PolymerElement('vaadin-combo-box'),
     PolymerElement('paper-input'),
     QueryComponent
   ],
-  pipes: [MapToIterable]
+  providers: [ UiWrapperService ]
 })
 export class UiWrapperComponent implements OnInit {
 
-  constructor(private dataQueryService: DataQueryService) { }
+  constructor(private dataQueryService: DataQueryService, private uiWrapperService: UiWrapperService) { }
 
-  tableNames: any;
   errorMessage: any;
-  selectedItem: Object;
-  selectedEntity: any;
-  value: string;
+  // selectedEntity: Entity;
+  selectedEntityName: string;
+  selectedTable: DbTable;
+  tableNames: DbTable[];
 
   ngOnInit() {
     this.dataQueryService.dbTables$.subscribe(
-      data => this.tableNames = data,
+      data => this.tableNames = <DbTable[]>data,
       error => this.errorMessage = <any>error
     );
-    this.dataQueryService.entity$.subscribe(
-      data => {
-        this.selectedEntity = data;
-      },
-      error => this.errorMessage = <any>error
-    );
-
+    // this.dataQueryService.entity$.subscribe(
+    //   data => this.selectedEntity = <Entity>data,
+    //   error => this.errorMessage = <any>error
+    // );
   }
 
-  getNewEntity(entityName) {
+  getNewEntity(entityName: DbTable) {
+    this.uiWrapperService.setActiveTable(this.selectedTable.name);
     if (entityName) {
       this.dataQueryService.getEntityMetaData(entityName.entity);
     }

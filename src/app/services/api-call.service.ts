@@ -8,7 +8,7 @@ export class ApiCallService {
 
   constructor(private http: Http) { }
 
-  private apiBaseUrl =
+  private apiBaseUrl: string =
   'http://localhost:50657/api/'
   //'http://ntserver2:8085/api/'
 
@@ -23,7 +23,7 @@ export class ApiCallService {
   }
 
   private handleError(error: any) {
-    let errMsg = (error.message) ? error.message : error.status ? `${error.status} - ${error.statusText}` : 'Server error';
+    let errMsg: string = (error.message) ? error.message : error.status ? `${error.status} - ${error.statusText}` : 'Server error';
     console.error(errMsg); // log to console instead
     return Observable.throw(errMsg);
   }

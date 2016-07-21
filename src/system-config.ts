@@ -7,13 +7,32 @@
  **********************************************************************************************/
 /** Map relative paths to URLs. */
 const map: any = {
-  '@vaadin': 'vendor/@vaadin'
+  '@vaadin': 'vendor/@vaadin',
+  '@angular2-material': 'vendor/@angular2-material'
 };
 
 /** User packages configuration. */
 const packages: any = {
-  '@vaadin/angular2-polymer': { main: 'index.js', defaultExtension: 'js' }
+  '@vaadin/angular2-polymer': { main: 'index.js', defaultExtension: 'js' },
+  'app/models': { main: 'index.js', defaultExtension: 'js' }
 };
+
+// put the names of any of your Material components here
+const materialPkgs:string[] = [
+  'core',
+  'button',
+  'card',
+  'checkbox',
+  'input',
+  'radio',
+  'sidenav',
+  'slide-toggle',
+  'tabs'
+];
+
+materialPkgs.forEach((pkg) => {
+  packages[`@angular2-material/${pkg}`] = {main: `${pkg}.js`};
+});
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 /***********************************************************************************************
@@ -36,10 +55,11 @@ const barrels: string[] = [
   // App specific barrels.
   'app',
   'app/shared',
-  'app/+ui-wrapper',
   'app/services',
-  'app/+ui-wrapper/search-filter',
-  'app/+ui-wrapper/query'
+  'app/+ui-wrapper',
+  'app/+ui-wrapper/query',
+  'app/+ui-wrapper/query/query-filter',
+  'app/+ui-wrapper/shared'
   /** @cli-barrel */
 ];
 

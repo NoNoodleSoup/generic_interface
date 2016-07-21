@@ -1,18 +1,19 @@
-<div class="fieldset">
-    <vaadin-combo-box label="Search" [items]="tableNames" item-label-path="name" item-value-path="entity" [(value)]="selectedEntityName"
-        (selected-item-changed)="selectedItem=$event.detail.value; getNewEntity($event.detail.value)"></vaadin-combo-box>
-</div>
-
-<div *ngIf="selectedItem">
-    <div style="margin-top: 40px;">
-        <h3>{{selectedItem.name ? "The currently selected table is: " + selectedItem.name : "No Table Selected"}}</h3>
+<div class="row">
+    <div class="col-lg-16 filter-section">
+        <md-card>
+            <vaadin-combo-box label="Search" [items]="tableNames" item-label-path="name" item-value-path="entity" [(value)]="selectedEntityName"
+                (selected-item-changed)="selectedTable=$event.detail.value; getNewEntity($event.detail.value)">
+                <paper-icon-button icon="remove-circle" class="clear-button"></paper-icon-button>
+            </vaadin-combo-box>
+        </md-card>
     </div>
 </div>
 
-<div *ngIf="selectedEntityName">
-    <div style="margin-top: 40px;">
-        <h3>The currently selected entity is: {{selectedEntityName}}</h3>
+<div class="row">
+    <div class="col-lg-16 filter-section">
+        <md-card>
+            <!--[entityObj]="selectedEntity" -->
+            <query [tableName]="selectedTable?.name"></query>
+        </md-card>
     </div>
-
-    <query [entityObj]="selectedEntity"></query>
 </div>

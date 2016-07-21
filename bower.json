@@ -16,6 +16,8 @@
   ],
   "dependencies": {
     "paper-elements": "^1.0.7",
-    "vaadin-combo-box": "^1.1.1"
+    "vaadin-combo-box": "^1.1.1",
+    "vaadin-date-picker": "^1.1.1",
+    "paper-time-picker": "^1.1.2"
   }
 }

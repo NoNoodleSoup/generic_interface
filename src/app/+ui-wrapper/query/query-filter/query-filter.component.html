@@ -1,0 +1,40 @@
+<p>
+  query-filter works!
+</p>
+
+
+
+<!--<div style="display: inline-block">
+    <paper-input readonly value="Where" style="width: 3em; margin-left: .8em; margin-right: .8em; display: inline-block;">
+    </paper-input>
+
+    <vaadin-combo-box label="Select a Field" style="width: 304px; margin-left: .8em; margin-right: .8em; display: inline-block;"
+        [items]="entityProperties" item-label-path="displayName" item-value-path="property" [(value)]="propertyValue" (selected-item-changed)="propertyDataType = $event.detail.value?.dataType; newQuery();">
+        <paper-icon-button icon="remove-circle" class="clear-button"></paper-icon-button>
+    </vaadin-combo-box>
+
+    <vaadin-combo-box style="width: 224px; margin-left: .8em; margin-right: .8em; display: inline-block;" label="Comparitor"
+        [items]="comparisonOperators" item-label-path="operator" item-value-path="operator" [(value)]="operatorValue" (selected-item-changed)="openDialog()">
+        <paper-icon-button icon="remove-circle" class="clear-button"></paper-icon-button>
+    </vaadin-combo-box>
+
+    <div [ngSwitch]="propertyDataType" style="display:inline-block">
+
+        <paper-input *ngSwitchDefault [(value)]="condition" label="Condition" style="width: 370px; margin-left: .8em; margin-right: .8em;"></paper-input>
+
+        <vaadin-date-picker *ngSwitchCase=" 'DateTime?' " style=" margin-left: .8em; margin-right: .8em;" label="Date" [(value)]="condition"></vaadin-date-picker>
+
+        <paper-dialog *ngSwitchCase=" 'DateTime' " modal id="dialog" class="paper-time-picker-dialog" on-iron-overlay-closed="dismissDialog">
+            <paper-time-picker id="timePicker" animated=" 'true' " [(time)]="time"></paper-time-picker>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button dialog-confirm>OK</paper-button>
+            </div>
+        </paper-dialog>
+    </div>
+</div>
+<paper-button class="exe" (click)="submitQuery()">Submit</paper-button>
+<paper-button class="clr" (click)="clearForm()">Clear</paper-button>
+
+
+<h4>{{testString}}</h4>-->
