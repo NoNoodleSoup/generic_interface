@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ChangeDetectorRef } from '@angular/core';
 
 import { PolymerElement } from '@vaadin/angular2-polymer';
 import { Subscription }   from 'rxjs/Subscription';
@@ -26,12 +26,8 @@ export class QueryFilterComponent implements OnInit {
 
   entityProperties: any;
   comparisonOperators: Object[];
-  model: QueryForm;
-  condition: string;
-  operatorValue: string;
+  model: QueryForm = new QueryForm('', 'WHERE', '', '', '');;
   propertyDataType: string;
-  propertyValue: string;
-  tableName: string;
   testString: string;
   uiWrapperSub: Subscription;
   dataQuerySub: Subscription;
@@ -40,14 +36,10 @@ export class QueryFilterComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.model = new QueryForm('', 'WHERE', '', '', '');
-
     this.uiWrapperSub = this.uiWrapperService.activeTable$.subscribe(
-      x => {
-        this.model.dbTable = x;
-        this.clearForm();
+      table => {
+        this.clearForm(table);
         this.cd.markForCheck();
-        //this class property needs to be moved outside the component when finished
         this.comparisonOperators = [
           { operator: 'Is', value: '' },
           { operator: 'Is Not', value: '' },
@@ -76,17 +68,15 @@ export class QueryFilterComponent implements OnInit {
     this.dataQuerySub.unsubscribe();
   }
 
-  clearForm() {
-    this.propertyValue = '';
-    this.comparisonOperators = [];
-    this.operatorValue = '';
+  clearForm(table: string) {
+    this.model = new QueryForm(table, 'WHERE', '', '', '');
     this.propertyDataType = '';
-    this.condition = '';
+    this.comparisonOperators = [];
     this.testString = '';
   }
 
   openDialog() {
-    if (this.propertyDataType === 'DateTime' || this.operatorValue) {
+    if (this.propertyDataType === 'DateTime' || this.model.comparisonOperator) {
       var dialog: any = document.getElementById('dialog');
       if (dialog) {
         dialog.open();
@@ -95,9 +85,6 @@ export class QueryFilterComponent implements OnInit {
   }
 
   submitQuery() {
-    this.model.field = this.propertyValue;
-    this.model.comparisonOperator = this.operatorValue;
-    this.model.condition = this.condition;
     this.testString = JSON.stringify(this.model, null, '\t');
   }
 
