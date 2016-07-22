@@ -1,4 +1,4 @@
-/*paper-button.exe {
+paper-button.exe {
   background: #F44336;
   color: white;
 }
@@ -6,4 +6,12 @@
 paper-button.clr {
   background: #03A9F4;
   color: white;
-}*/
+}
+  
+iron-icon.time-icon {
+  color: rgba(0, 0, 0, .33);
+}
+
+iron-icon.time-icon:hover {
+ color: rgba(0, 0, 0, .66);
+}

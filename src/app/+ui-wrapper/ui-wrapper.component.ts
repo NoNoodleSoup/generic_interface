@@ -4,7 +4,7 @@ import { PolymerElement } from '@vaadin/angular2-polymer';
 import { MdCard } from '@angular2-material/card';
 
 import { DataQueryService } from '../services';
-import { DbTable, Entity } from '../models'
+import { DbTable } from '../models'
 import { UiWrapperService } from './shared';
 import { QueryComponent } from './query';
 
@@ -17,31 +17,23 @@ import { QueryComponent } from './query';
   directives: [
     MdCard,
     PolymerElement('vaadin-combo-box'),
-    PolymerElement('paper-input'),
     QueryComponent
   ],
-  providers: [UiWrapperService]
+  providers: [ UiWrapperService ]
 })
 export class UiWrapperComponent implements OnInit {
-
-  constructor(private dataQueryService: DataQueryService, private uiWrapperService: UiWrapperService) { }
-
   errorMessage: any;
-  // selectedEntity: Entity;
   selectedEntityName: string;
   selectedTable: DbTable;
   tableNames: DbTable[];
+
+  constructor(private dataQueryService: DataQueryService, private uiWrapperService: UiWrapperService) { }
 
   ngOnInit() {
     this.dataQueryService.dbTables$.subscribe(
       data => this.tableNames = <DbTable[]>data,
       error => this.errorMessage = <any>error
     );
-    
-    // this.dataQueryService.entity$.subscribe(
-    //   data => this.selectedEntity = <Entity>data,
-    //   error => this.errorMessage = <any>error
-    // );
   }
 
   getNewEntity(entityName: DbTable) {
