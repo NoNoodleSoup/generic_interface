@@ -20,7 +20,7 @@ import { QueryComponent } from './query';
     PolymerElement('paper-input'),
     QueryComponent
   ],
-  providers: [ UiWrapperService ]
+  providers: [UiWrapperService]
 })
 export class UiWrapperComponent implements OnInit {
 
@@ -37,6 +37,7 @@ export class UiWrapperComponent implements OnInit {
       data => this.tableNames = <DbTable[]>data,
       error => this.errorMessage = <any>error
     );
+    
     // this.dataQueryService.entity$.subscribe(
     //   data => this.selectedEntity = <Entity>data,
     //   error => this.errorMessage = <any>error
@@ -44,8 +45,8 @@ export class UiWrapperComponent implements OnInit {
   }
 
   getNewEntity(entityName: DbTable) {
-    this.uiWrapperService.setActiveTable(this.selectedTable.name);
     if (entityName) {
+      this.uiWrapperService.setActiveTable(this.selectedTable.name);
       this.dataQueryService.getEntityMetaData(entityName.entity);
     }
   }

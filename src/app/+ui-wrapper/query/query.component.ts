@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, Output, SimpleChange } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, Output, SimpleChange } from '@angular/core';
 
 import { PolymerElement } from '@vaadin/angular2-polymer';
 import { Subscription }   from 'rxjs/Subscription';
@@ -13,6 +13,7 @@ import { UiWrapperService } from '../shared';
   templateUrl: 'query.component.html',
   styleUrls: ['query.component.css'],
   directives: [
+    PolymerElement('iron-flex-layout'),
     PolymerElement('paper-button'),
     PolymerElement('paper-dialog'),
     PolymerElement('paper-input'),
@@ -26,34 +27,44 @@ import { UiWrapperService } from '../shared';
 export class QueryComponent implements OnInit {
 
   // @Input() entityObj: Object;
-  @Input() tableName: string;
-
-  comparisonOperators: Object[];
-  condition: string;
-  model: QueryForm;
-  operatorValue: string;
+  // @Input() tableName: string;
   entityProperties: any;
+  comparisonOperators: Object[];
+  model: QueryForm;
+  condition: string;
+  operatorValue: string;
   propertyDataType: string;
   propertyValue: string;
+  tableName: string;
   testString: string;
-  time: string;
+  // time: string;
+  uiWrapperSub: Subscription;
+  dataQuerySub: Subscription;
 
-  subscription: Subscription;
-
-  constructor(private dataQueryService: DataQueryService, private uiWrapperService: UiWrapperService) {
-      this.subscription = uiWrapperService.activeTable$.subscribe(
-        x => {console.log(x);this.clearForm();}
-      );
-   }
+  constructor(private dataQueryService: DataQueryService, private uiWrapperService: UiWrapperService, private cd: ChangeDetectorRef) {
+  }
 
   ngOnInit() {
-    this.dataQueryService.entity$.subscribe(
+    this.model = new QueryForm('', 'WHERE', '', '', '');
+
+    this.uiWrapperSub = this.uiWrapperService.activeTable$.subscribe(
+      x => {
+        this.model.dbTable = x;
+        this.clearForm();
+        this.cd.markForCheck();
+      }
+    );
+
+    this.dataQuerySub = this.dataQueryService.entity$.subscribe(
       data => {
         this.entityProperties = data.Properties;
-        this.model.dbTable = this.tableName;
       });
-    this.model = new QueryForm('', 'WHERE', '', '', '');
-    
+  }
+
+  ngOnDestroy() {
+    // prevent memory leak when component destroyed
+    this.uiWrapperSub.unsubscribe();
+    this.dataQuerySub.unsubscribe();
   }
 
   // CAN PROBABLY REMOVE THIS CODE
@@ -68,6 +79,7 @@ export class QueryComponent implements OnInit {
     this.propertyValue = '';
     this.operatorValue = '';
     this.condition = '';
+    this.propertyDataType = '';
     this.testString = '';
   }
 

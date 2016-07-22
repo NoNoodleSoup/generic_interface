@@ -16,15 +16,18 @@
 
         <paper-input *ngSwitchDefault [(value)]="condition" label="Condition" style="width: 370px; margin-left: .8em; margin-right: .8em;"></paper-input>
 
-        <vaadin-date-picker *ngSwitchCase=" 'DateTime?' " style=" margin-left: .8em; margin-right: .8em;" label="Date" [(value)]="condition"></vaadin-date-picker>
+        <vaadin-date-picker *ngSwitchCase=" 'DateTime?' " style="width: 370px; margin-left: .8em; margin-right: .8em;" label="Date"
+            [(value)]="condition"></vaadin-date-picker>
 
-        <paper-dialog *ngSwitchCase=" 'DateTime' " modal id="dialog" class="paper-time-picker-dialog" on-iron-overlay-closed="dismissDialog">
-            <paper-time-picker id="timePicker" animated=" 'true' " [(time)]="time"></paper-time-picker>
+
+
+        <!--<paper-dialog *ngSwitchCase=" 'DateTime' " modal id="dialog" class="paper-time-picker-dialog" on-iron-overlay-closed="dismissDialog">
+            <paper-time-picker id="timePicker" animated=" 'true' " [(time)]="condition"></paper-time-picker>
             <div class="buttons">
                 <paper-button dialog-dismiss>Cancel</paper-button>
                 <paper-button dialog-confirm>OK</paper-button>
             </div>
-        </paper-dialog>
+        </paper-dialog>-->
     </div>
 </div>
 <paper-button class="exe" (click)="submitQuery()">Submit</paper-button>
@@ -32,3 +35,14 @@
 
 
 <h4>{{testString}}</h4>
+
+    <paper-input value="" style="width: 370px; margin-left: .8em; margin-right: .8em; display: inline-block;">
+    </paper-input>
+
+<paper-dialog modal id="dialog" class="paper-time-picker-dialog" on-iron-overlay-closed="dismissDialog">
+            <paper-time-picker id="timePicker" animated=" 'true' " [(time)]="condition"></paper-time-picker>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button dialog-confirm>OK</paper-button>
+            </div>
+        </paper-dialog>
