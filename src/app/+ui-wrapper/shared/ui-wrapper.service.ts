@@ -5,9 +5,11 @@ import { Subject }    from 'rxjs/Subject';
 export class UiWrapperService {
   // Observable string sources
   private activeTableSource = new Subject<string>();
+  private queryStatementSource = new Subject<string>();
 
   // Observable string streams
-  activeTable$ = this.activeTableSource.asObservable()
+  activeTable$ = this.activeTableSource.asObservable();
+  queryStatement$ = this.queryStatementSource.asObservable();
 
   constructor() { }
 
@@ -15,5 +17,6 @@ export class UiWrapperService {
   setActiveTable(table: string) {
     this.activeTableSource.next(table);
   }
+
 
 }

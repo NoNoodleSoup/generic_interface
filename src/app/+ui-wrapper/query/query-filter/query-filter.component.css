@@ -7,6 +7,11 @@ paper-button.clr {
   background: #03A9F4;
   color: white;
 }
+
+paper-button.del {
+  background: #8BC34A;
+  color: white;
+}
   
 iron-icon.time-icon {
   color: rgba(0, 0, 0, .33);

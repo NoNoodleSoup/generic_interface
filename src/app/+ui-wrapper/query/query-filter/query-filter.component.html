@@ -1,26 +1,36 @@
-<div style="display: inline-block">
-    <paper-input readonly value="Where" style="width: 3em; margin-left: .8em; margin-right: .8em; display: inline-block;">
+<!--TODO: strip all functionality that is not strictly form related such as displaying or receiving data to and from form inputs-->
+
+<div *ngFor="let model of modelArray" style="display: inline-block">
+    <paper-button class="del" *ngIf="model !== modelArray[0] && model === modelArray[modelArray.length - 1]" (click)="deleteFromQuery(model)">-</paper-button>
+
+    <paper-input label="Clause" *ngIf="model === modelArray[0]" disabled [value]="model.sqlClause" style="width: 6em; margin-left: .8em; margin-right: .8em; display: inline-block;">
     </paper-input>
 
-    <vaadin-combo-box label="Select a Field" style="width: 304px; margin-left: .8em; margin-right: .8em; display: inline-block;"
+    <vaadin-combo-box *ngIf="model !== modelArray[0]" label="Clause" [items]="sqlClause" [(value)]="model.sqlClause" [disabled]="!model.isActive"
+        style="width: 6em; margin-left: .8em; margin-right: .8em; display: inline-block;">
+        <paper-icon-button icon="remove-circle" class="clear-button"></paper-icon-button>
+    </vaadin-combo-box>
+
+
+    <vaadin-combo-box [disabled]='!model.isActive' label="Select a Field" style="width: 286px; margin-left: .8em; margin-right: .8em; display: inline-block;"
         [items]="entityProperties" item-label-path="displayName" item-value-path="property" [(value)]="model.field" (selected-item-changed)="propertyDataType = $event.detail.value?.dataType;">
         <paper-icon-button icon="remove-circle" class="clear-button"></paper-icon-button>
     </vaadin-combo-box>
 
-    <vaadin-combo-box style="width: 224px; margin-left: .8em; margin-right: .8em; display: inline-block;" label="Comparitor"
-        [items]="comparisonOperators" item-label-path="operator" item-value-path="operator" [(value)]="model.comparisonOperator">
+    <vaadin-combo-box [disabled]='!model.isActive' style="width: 224px; margin-left: .8em; margin-right: .8em; display: inline-block;"
+        label="Comparitor" [items]="comparisonOperators" item-label-path="operator" item-value-path="operator" [(value)]="model.comparisonOperator">
         <paper-icon-button icon="remove-circle" class="clear-button"></paper-icon-button>
     </vaadin-combo-box>
 
     <div [ngSwitch]="propertyDataType" style="display:inline-block">
 
-        <paper-input *ngSwitchDefault [(value)]="model.condition" label="Condition" style="width: 370px; margin-left: .8em; margin-right: .8em;"></paper-input>
+        <paper-input [disabled]='!model.isActive' *ngSwitchDefault [(value)]="model.condition" label="Condition" style="width: 370px; margin-left: .8em; margin-right: .8em;"></paper-input>
 
-        <vaadin-date-picker *ngSwitchCase=" 'DateTime?' " style="width: 370px; margin-left: .8em; margin-right: .8em;" label="Date"
-            [(value)]="model.condition"></vaadin-date-picker>
+        <vaadin-date-picker [disabled]='!model.isActive' *ngSwitchCase=" 'DateTime?' " style="width: 370px; margin-left: .8em; margin-right: .8em;"
+            label="Date" [(value)]="model.condition"></vaadin-date-picker>
 
         <div *ngSwitchCase=" 'DateTime' ">
-            <paper-input (focus)="openDialog()" [value]="model.condition" label="Time" style="width: 370px; margin-left: .8em; margin-right: .8em;">
+            <paper-input [disabled]='!model.isActive' (focus)="openDialog(model)" [value]="model.condition" label="Time" style="width: 370px; margin-left: .8em; margin-right: .8em;">
                 <iron-icon icon="schedule" class="time-icon" suffix></iron-icon>
             </paper-input>
 
@@ -34,9 +44,13 @@
         </div>
 
     </div>
+    <paper-button class="exe" *ngIf="model === modelArray[modelArray.length - 1]" (click)="addToQuery(model)">+</paper-button>
+    <paper-button class="clr" *ngIf="model === modelArray[modelArray.length - 1]" (click)="clearForm(model); ">Clear</paper-button>
 </div>
+
+
+<hr style="margin: 24px; 0px;" />
+
 <paper-button class="exe" (click)="submitQuery()">Submit</paper-button>
-<paper-button class="clr" (click)="clearForm()">Clear</paper-button>
 
 <h4>{{testString}}</h4>
-<query-filter></query-filter>

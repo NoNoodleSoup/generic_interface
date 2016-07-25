@@ -24,13 +24,28 @@ import { UiWrapperService } from '../../shared';
 })
 export class QueryFilterComponent implements OnInit {
 
+  //Do not leave comparisonOperators property like this!!
+  comparisonOperators: Object[] = [
+    { operator: 'Is', value: '' },
+    { operator: 'Is Not', value: '' },
+    { operator: 'Like', value: '' },
+    { operator: 'Less Than', value: '' },
+    { operator: 'Less Than or Equal', value: '' },
+    { operator: 'Greater Than', value: '' },
+    { operator: 'Greater Than or Equal', value: '' },
+    { operator: 'In', value: '' },
+    { operator: 'Not In', value: '' },
+    { operator: 'Is Null', value: '' },
+    { operator: 'Is Not Null', value: '' }
+  ];
+  dataQuerySub: Subscription;
   entityProperties: any;
-  comparisonOperators: Object[];
-  model: QueryForm = new QueryForm('', 'WHERE', '', '', '');;
+  modelArray: QueryForm[] = [new QueryForm('', '', '', '')];
   propertyDataType: string;
+  sqlClause: string[] = ['AND', 'OR'];
+  tableName: string;
   testString: string;
   uiWrapperSub: Subscription;
-  dataQuerySub: Subscription;
 
   constructor(private dataQueryService: DataQueryService, private uiWrapperService: UiWrapperService, private cd: ChangeDetectorRef) {
   }
@@ -38,21 +53,9 @@ export class QueryFilterComponent implements OnInit {
   ngOnInit() {
     this.uiWrapperSub = this.uiWrapperService.activeTable$.subscribe(
       table => {
-        this.clearForm(table);
+        this.tableName = table;
+        this.modelArray = [new QueryForm('WHERE', '', '', '', true)];
         this.cd.markForCheck();
-        this.comparisonOperators = [
-          { operator: 'Is', value: '' },
-          { operator: 'Is Not', value: '' },
-          { operator: 'Like', value: '' },
-          { operator: 'Less Than', value: '' },
-          { operator: 'Less Than or Equal', value: '' },
-          { operator: 'Greater Than', value: '' },
-          { operator: 'Greater Than or Equal', value: '' },
-          { operator: 'In', value: '' },
-          { operator: 'Not In', value: '' },
-          { operator: 'Is Null', value: '' },
-          { operator: 'Is Not Null', value: '' }
-        ];
       }
     );
 
@@ -68,15 +71,38 @@ export class QueryFilterComponent implements OnInit {
     this.dataQuerySub.unsubscribe();
   }
 
-  clearForm(table: string) {
-    this.model = new QueryForm(table, 'WHERE', '', '', '');
-    this.propertyDataType = '';
-    this.comparisonOperators = [];
-    this.testString = '';
+  addToQuery(model) {
+    model.isActive = false;
+    let invalid: boolean = false;
+    //Code below checking the presence of empty strings is most likely unneccesary due to validation which will be added later.
+    for (var key in model) {
+      if (model[key] === '') {
+        invalid = true;
+        break;
+      }
+    }
+    if (!invalid) {
+      this.modelArray.push(new QueryForm('', '', '', '', true));
+    }
   }
 
-  openDialog() {
-    if (this.propertyDataType === 'DateTime' || this.model.comparisonOperator) {
+  clearForm(model: QueryForm) {
+    var index = this.modelArray.indexOf(model);
+    if (index === 0) {
+      this.modelArray[index] = new QueryForm('WHERE', '', '', '', true);
+    } else {
+      this.modelArray[index] = new QueryForm('', '', '', '', true);
+      this.propertyDataType = '';
+      this.testString = '';
+    }
+  }
+
+  deleteFromQuery(model: QueryForm) {
+    this.modelArray = this.modelArray.filter(m => m !== model);
+  }
+
+  openDialog(model) {
+    if (this.propertyDataType === 'DateTime' || model.comparisonOperator) {
       var dialog: any = document.getElementById('dialog');
       if (dialog) {
         dialog.open();
@@ -85,7 +111,24 @@ export class QueryFilterComponent implements OnInit {
   }
 
   submitQuery() {
-    this.testString = JSON.stringify(this.model, null, '\t');
+    let invalid: boolean = false;
+    this.modelArray.forEach(model => {
+      //Code below checking the presence of empty strings is most likely unneccesary due to validation which will be added later.
+      for (var key in model) {
+        if (model[key] === '') {
+          invalid = true;
+          break;
+        }
+      }
+      if (!invalid) {
+        if (this.testString === undefined) {
+          this.testString = '{ ' + '"' + this.tableName + '": [';
+        }
+        this.testString += JSON.stringify(model, null, '\t');
+      }
+    }
+    );
+    this.testString += '] }';
   }
 
 }
