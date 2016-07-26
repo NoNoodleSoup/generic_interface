@@ -13,9 +13,10 @@
 
 
     <vaadin-combo-box [disabled]='!model.isActive' label="Select a Field" style="width: 286px; margin-left: .8em; margin-right: .8em; display: inline-block;"
-        [items]="entityProperties" item-label-path="displayName" item-value-path="property" [(value)]="model.field" (selected-item-changed)="propertyDataType = $event.detail.value?.dataType;">
+        [items]="entityProperties" item-label-path="displayName" item-value-path="property" [(value)]="model.field" (selected-item-changed)="propertyDataType = $event.detail.value?.dataType; getOperators()">
         <paper-icon-button icon="remove-circle" class="clear-button"></paper-icon-button>
     </vaadin-combo-box>
+
 
     <vaadin-combo-box [disabled]='!model.isActive' style="width: 224px; margin-left: .8em; margin-right: .8em; display: inline-block;"
         label="Comparitor" [items]="comparisonOperators" item-label-path="operator" item-value-path="operator" [(value)]="model.comparisonOperator">
@@ -24,12 +25,18 @@
 
     <div [ngSwitch]="propertyDataType" style="display:inline-block">
 
-        <paper-input [disabled]='!model.isActive' *ngSwitchDefault [(value)]="model.condition" label="Condition" style="width: 370px; margin-left: .8em; margin-right: .8em;"></paper-input>
-
-        <vaadin-date-picker [disabled]='!model.isActive' *ngSwitchCase=" 'DateTime?' " style="width: 370px; margin-left: .8em; margin-right: .8em;"
+        <vaadin-date-picker [disabled]='!model.isActive' *ngSwitchCase=" 'DateTime' " style="width: 370px; margin-left: .8em; margin-right: .8em;"
             label="Date" [(value)]="model.condition"></vaadin-date-picker>
 
-        <div *ngSwitchCase=" 'DateTime' ">
+        <paper-radio-group *ngSwitchCase=" 'Boolean' " allow-empty-selection [(selected)]="model.condition">
+            <paper-radio-button name="true">True</paper-radio-button>
+            <paper-radio-button name="false">False</paper-radio-button>
+        </paper-radio-group>
+
+        <paper-input [disabled]='!model.isActive' *ngSwitchDefault [(value)]="model.condition" label="Condition" style="width: 370px; margin-left: .8em; margin-right: .8em;"></paper-input>
+        <!--The below SwichCase is unusable at the moment until further updates to the api and data-model allow time as an attribute
+            to identify datetime properties explicitly as time or date-->
+        <!--<div *ngSwitchCase=" 'DateTime' ">
             <paper-input [disabled]='!model.isActive' (focus)="openDialog(model)" [value]="model.condition" label="Time" style="width: 370px; margin-left: .8em; margin-right: .8em;">
                 <iron-icon icon="schedule" class="time-icon" suffix></iron-icon>
             </paper-input>
@@ -41,8 +48,7 @@
                     <paper-button dialog-confirm>OK</paper-button>
                 </div>
             </paper-dialog>
-        </div>
-
+        </div>-->
     </div>
     <paper-button class="exe" *ngIf="model === modelArray[modelArray.length - 1]" (click)="addToQuery(model)">+</paper-button>
     <paper-button class="clr" *ngIf="model === modelArray[modelArray.length - 1]" (click)="clearForm(model); ">Clear</paper-button>
@@ -52,5 +58,6 @@
 <hr style="margin: 24px; 0px;" />
 
 <paper-button class="exe" (click)="submitQuery()">Submit</paper-button>
+
 
 <h4>{{testString}}</h4>

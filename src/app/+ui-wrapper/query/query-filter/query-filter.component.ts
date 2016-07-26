@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { NgForm }    from '@angular/forms';
 
 import { PolymerElement } from '@vaadin/angular2-polymer';
 import { Subscription }   from 'rxjs/Subscription';
@@ -16,6 +17,8 @@ import { UiWrapperService } from '../../shared';
     PolymerElement('paper-button'),
     PolymerElement('paper-dialog'),
     PolymerElement('paper-input'),
+    PolymerElement('paper-radio-button'),
+    PolymerElement('paper-radio-group'),
     PolymerElement('paper-time-picker'),
     PolymerElement('vaadin-date-picker'),
     PolymerElement('vaadin-combo-box')
@@ -40,9 +43,11 @@ export class QueryFilterComponent implements OnInit {
   ];
   dataQuerySub: Subscription;
   entityProperties: any;
+  formObj: Object = {};
   modelArray: QueryForm[] = [new QueryForm('', '', '', '')];
   propertyDataType: string;
   sqlClause: string[] = ['AND', 'OR'];
+  submitted = false;
   tableName: string;
   testString: string;
   uiWrapperSub: Subscription;
@@ -53,7 +58,9 @@ export class QueryFilterComponent implements OnInit {
   ngOnInit() {
     this.uiWrapperSub = this.uiWrapperService.activeTable$.subscribe(
       table => {
+        this.formObj = { [table]: [] }
         this.tableName = table;
+        this.testString = undefined;
         this.modelArray = [new QueryForm('WHERE', '', '', '', true)];
         this.cd.markForCheck();
       }
@@ -72,7 +79,6 @@ export class QueryFilterComponent implements OnInit {
   }
 
   addToQuery(model) {
-    model.isActive = false;
     let invalid: boolean = false;
     //Code below checking the presence of empty strings is most likely unneccesary due to validation which will be added later.
     for (var key in model) {
@@ -82,23 +88,80 @@ export class QueryFilterComponent implements OnInit {
       }
     }
     if (!invalid) {
+      model.isActive = false;
       this.modelArray.push(new QueryForm('', '', '', '', true));
     }
   }
 
   clearForm(model: QueryForm) {
-    var index = this.modelArray.indexOf(model);
+    let index = this.modelArray.indexOf(model);
+    this.propertyDataType = '';
+    this.testString = undefined;
+
     if (index === 0) {
       this.modelArray[index] = new QueryForm('WHERE', '', '', '', true);
     } else {
       this.modelArray[index] = new QueryForm('', '', '', '', true);
-      this.propertyDataType = '';
-      this.testString = '';
     }
   }
 
   deleteFromQuery(model: QueryForm) {
     this.modelArray = this.modelArray.filter(m => m !== model);
+  }
+
+  getOperators() {
+    let nullable: boolean = false;
+    if (this.propertyDataType[this.propertyDataType.length - 1] === '?') {
+      nullable = true;
+      this.propertyDataType = this.propertyDataType.slice(0, -1);
+    }
+    switch (this.propertyDataType) {
+      case 'Boolean': this.comparisonOperators = [
+        { operator: 'Is', value: '' },
+        { operator: 'Is Not', value: '' }
+      ];
+        break;
+      case 'Int32':
+      case 'DateTime': this.comparisonOperators = [
+        { operator: 'Is', value: '' },
+        { operator: 'Is Not', value: '' },
+        { operator: 'Less Than', value: '' },
+        { operator: 'Less Than or Equal', value: '' },
+        { operator: 'Greater Than', value: '' },
+        { operator: 'Greater Than or Equal', value: '' },
+      ];
+        break;
+      case 'Enum': this.comparisonOperators = [
+        { operator: 'Is', value: '' },
+        { operator: 'Is Not', value: '' },
+      ]
+      case 'String': this.comparisonOperators = [
+        { operator: 'Is', value: '' },
+        { operator: 'Is Not', value: '' },
+        { operator: 'Like', value: '' }
+      ];
+        break;
+      default: this.comparisonOperators = [
+        { operator: 'Is', value: '' },
+        { operator: 'Is Not', value: '' },
+        { operator: 'Like', value: '' },
+        { operator: 'Less Than', value: '' },
+        { operator: 'Less Than or Equal', value: '' },
+        { operator: 'Greater Than', value: '' },
+        { operator: 'Greater Than or Equal', value: '' },
+        { operator: 'In', value: '' },
+        { operator: 'Not In', value: '' },
+        { operator: 'Is Null', value: '' },
+        { operator: 'Is Not Null', value: '' }
+      ];
+        break;
+    }
+    if (nullable) {
+      this.comparisonOperators.push(
+        { operator: 'Is Null', value: '' },
+        { operator: 'Is Not Null', value: '' }
+      );
+    }
   }
 
   openDialog(model) {
@@ -111,6 +174,7 @@ export class QueryFilterComponent implements OnInit {
   }
 
   submitQuery() {
+    this.submitted = true;
     let invalid: boolean = false;
     this.modelArray.forEach(model => {
       //Code below checking the presence of empty strings is most likely unneccesary due to validation which will be added later.
@@ -121,14 +185,12 @@ export class QueryFilterComponent implements OnInit {
         }
       }
       if (!invalid) {
-        if (this.testString === undefined) {
-          this.testString = '{ ' + '"' + this.tableName + '": [';
-        }
-        this.testString += JSON.stringify(model, null, '\t');
+        this.formObj[this.tableName].push(model);
       }
+    });
+    if (!invalid) {
+      this.testString = JSON.stringify(this.formObj, null, '\t');
     }
-    );
-    this.testString += '] }';
   }
 
 }
