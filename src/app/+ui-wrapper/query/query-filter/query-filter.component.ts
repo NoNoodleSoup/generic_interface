@@ -185,7 +185,9 @@ export class QueryFilterComponent implements OnInit {
         }
       }
       if (!invalid) {
-        this.formObj[this.tableName].push(model);
+        let temp = Object.assign({}, model);
+        delete temp.isActive;
+        this.formObj[this.tableName].push(temp);
       }
     });
     if (!invalid) {
