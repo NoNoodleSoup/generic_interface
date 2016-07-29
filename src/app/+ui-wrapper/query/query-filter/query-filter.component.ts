@@ -5,7 +5,7 @@ import { PolymerElement } from '@vaadin/angular2-polymer';
 import { Subscription }   from 'rxjs/Subscription';
 
 import { DataQueryService } from '../../../services';
-import { QueryForm } from '../../../models';
+import { QueryForm, Enum } from '../../../models';
 import { UiWrapperService } from '../../shared';
 
 @Component({
@@ -27,27 +27,16 @@ import { UiWrapperService } from '../../shared';
 })
 export class QueryFilterComponent implements OnInit {
 
-  //Do not leave comparisonOperators property like this!!
-  comparisonOperators: Object[] = [
-    { operator: 'Is', value: '' },
-    { operator: 'Is Not', value: '' },
-    { operator: 'Like', value: '' },
-    { operator: 'Less Than', value: '' },
-    { operator: 'Less Than or Equal', value: '' },
-    { operator: 'Greater Than', value: '' },
-    { operator: 'Greater Than or Equal', value: '' },
-    { operator: 'In', value: '' },
-    { operator: 'Not In', value: '' },
-    { operator: 'Is Null', value: '' },
-    { operator: 'Is Not Null', value: '' }
-  ];
+  comparisonOperators: Object[] = [];
   dataQuerySub: Subscription;
   entityProperties: any;
+  Enum: string;
+  enumMetaData: Enum;
+  errorMessage: string;
   formObj: Object = {};
-  modelArray: QueryForm[] = [new QueryForm('', '', '', '')];
-  propertyDataType: string;
+  modelArray: QueryForm[] = [new QueryForm('', '', '', '', '')];
   sqlClause: string[] = ['AND', 'OR'];
-  submitted = false;
+  submitted: boolean = false;
   tableName: string;
   testString: string;
   uiWrapperSub: Subscription;
@@ -59,17 +48,24 @@ export class QueryFilterComponent implements OnInit {
     this.uiWrapperSub = this.uiWrapperService.activeTable$.subscribe(
       table => {
         this.formObj = { [table]: [] }
+        this.modelArray = [new QueryForm('WHERE', '', '', '', '', true)];
         this.tableName = table;
+        this.comparisonOperators = [];
         this.testString = undefined;
-        this.modelArray = [new QueryForm('WHERE', '', '', '', true)];
         this.cd.markForCheck();
-      }
+      },
+      error => this.errorMessage = <string>error
     );
 
     this.dataQuerySub = this.dataQueryService.entity$.subscribe(
-      data => {
-        this.entityProperties = data.Properties;
-      });
+      data => this.entityProperties = data.Properties,
+      error => this.errorMessage = <string>error
+    );
+
+    this.dataQueryService.enum$.subscribe(
+      data => this.enumMetaData = data,
+      error => this.errorMessage = <string>error
+    )
   }
 
   ngOnDestroy() {
@@ -81,48 +77,47 @@ export class QueryFilterComponent implements OnInit {
   addToQuery(model) {
     let invalid: boolean = false;
     //Code below checking the presence of empty strings is most likely unneccesary due to validation which will be added later.
-    for (var key in model) {
-      if (model[key] === '') {
-        invalid = true;
-        break;
-      }
-    }
-    if (!invalid) {
+    if (model.condition) {
+      this.modelArray.push(new QueryForm('', '', '', '', '', true));
       model.isActive = false;
-      this.modelArray.push(new QueryForm('', '', '', '', true));
     }
   }
 
   clearForm(model: QueryForm) {
     let index = this.modelArray.indexOf(model);
-    this.propertyDataType = '';
-    this.testString = undefined;
-
-    if (index === 0) {
-      this.modelArray[index] = new QueryForm('WHERE', '', '', '', true);
-    } else {
-      this.modelArray[index] = new QueryForm('', '', '', '', true);
+    console.log(index);
+    if (index > 0) {
+      this.deleteFromQuery(model);
+    }
+    else{
+    model.dataType = undefined;
+      this.modelArray[index] = new QueryForm('WHERE', '', '', '', '', true);
     }
   }
 
-  deleteFromQuery(model: QueryForm) {
+  private deleteFromQuery(model: QueryForm) {
     this.modelArray = this.modelArray.filter(m => m !== model);
+    this.modelArray[this.modelArray.length - 1].isActive = true;
   }
 
-  getOperators() {
+  getOperators(model: QueryForm) {
     let nullable: boolean = false;
-    if (this.propertyDataType[this.propertyDataType.length - 1] === '?') {
+    if (model.dataType[model.dataType.length - 1] === '?') {
       nullable = true;
-      this.propertyDataType = this.propertyDataType.slice(0, -1);
+      model.dataType = model.dataType.slice(0, -1);
     }
-    switch (this.propertyDataType) {
+    if (model.comparisonOperator) {
+      model.comparisonOperator = '';
+      model.condition = '';
+    }
+    switch (model.dataType) {
       case 'Boolean': this.comparisonOperators = [
         { operator: 'Is', value: '' },
         { operator: 'Is Not', value: '' }
       ];
         break;
-      case 'Int32':
-      case 'DateTime': this.comparisonOperators = [
+      case 'DateTime':
+      case 'Int32': this.comparisonOperators = [
         { operator: 'Is', value: '' },
         { operator: 'Is Not', value: '' },
         { operator: 'Less Than', value: '' },
@@ -131,10 +126,12 @@ export class QueryFilterComponent implements OnInit {
         { operator: 'Greater Than or Equal', value: '' },
       ];
         break;
-      case 'Enum': this.comparisonOperators = [
-        { operator: 'Is', value: '' },
-        { operator: 'Is Not', value: '' },
-      ]
+      case 'Enum': this.getEnumMetaData(this.Enum);
+        this.comparisonOperators = [
+          { operator: 'Is', value: '' },
+          { operator: 'Is Not', value: '' }
+        ];
+        break;
       case 'String': this.comparisonOperators = [
         { operator: 'Is', value: '' },
         { operator: 'Is Not', value: '' },
@@ -164,8 +161,12 @@ export class QueryFilterComponent implements OnInit {
     }
   }
 
+  getEnumMetaData(dataType: string) {
+    this.dataQueryService.getEnumMetaData(dataType);
+  }
+
   openDialog(model) {
-    if (this.propertyDataType === 'DateTime' || model.comparisonOperator) {
+    if (model.dataType === 'DateTime' || model.comparisonOperator) {
       var dialog: any = document.getElementById('dialog');
       if (dialog) {
         dialog.open();
@@ -174,24 +175,21 @@ export class QueryFilterComponent implements OnInit {
   }
 
   submitQuery() {
-    this.submitted = true;
-    let invalid: boolean = false;
-    this.modelArray.forEach(model => {
-      //Code below checking the presence of empty strings is most likely unneccesary due to validation which will be added later.
-      for (var key in model) {
-        if (model[key] === '') {
-          invalid = true;
-          break;
-        }
-      }
-      if (!invalid) {
+    if (this.submitted) {
+      this.modelArray[this.modelArray.length - 1].isActive = true;
+      this.formObj = { [this.tableName]: [] }
+      this.testString = undefined;
+      this.submitted = false;
+    }
+    else if (this.modelArray[this.modelArray.length - 1].condition) {
+      this.modelArray.forEach(model => {
         let temp = Object.assign({}, model);
         delete temp.isActive;
         this.formObj[this.tableName].push(temp);
-      }
-    });
-    if (!invalid) {
+      });
       this.testString = JSON.stringify(this.formObj, null, '\t');
+      this.modelArray[this.modelArray.length - 1].isActive = false;
+      this.submitted = true;
     }
   }
 

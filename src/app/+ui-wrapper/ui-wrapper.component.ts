@@ -22,7 +22,7 @@ import { QueryComponent } from './query';
   providers: [ UiWrapperService ]
 })
 export class UiWrapperComponent implements OnInit {
-  errorMessage: any;
+  errorMessage: string;
   selectedEntityName: string;
   selectedTable: DbTable;
   tableNames: DbTable[];
@@ -30,16 +30,17 @@ export class UiWrapperComponent implements OnInit {
   constructor(private dataQueryService: DataQueryService, private uiWrapperService: UiWrapperService) { }
 
   ngOnInit() {
+    this.dataQueryService.getContextMetaData()
     this.dataQueryService.dbTables$.subscribe(
       data => this.tableNames = <DbTable[]>data,
-      error => this.errorMessage = <any>error
+      error => this.errorMessage = <string>error
     );
   }
 
   getNewEntity(entityName: DbTable) {
     if (entityName) {
-      this.uiWrapperService.setActiveTable(this.selectedTable.name);
-      this.dataQueryService.getEntityMetaData(entityName.entity);
+      this.uiWrapperService.setActiveTable(this.selectedTable.Name);
+      this.dataQueryService.getEntityMetaData(entityName.Entity);
     }
   }
 }

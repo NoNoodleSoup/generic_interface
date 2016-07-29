@@ -3,8 +3,8 @@ export /**
  */
 class DbTable {
 
-    name: string;
-    entity: string;
+    Name: string;
+    Entity: string;
 
     constructor() {
         

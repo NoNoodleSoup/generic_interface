@@ -11,7 +11,15 @@ export class Entity {
     Nestable: boolean;
     PendingEnables: boolean;
     Sequenced: boolean;
-    Properties: Object;
+    Properties: Property[];
 
     constructor() { }
+}
+
+class Property {
+    Property: string;
+    DisplayName: string;
+    Description: string;
+    DataType: string;
+    Enum: string;
 }

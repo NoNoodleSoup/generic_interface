@@ -1,7 +1,9 @@
 <!--TODO: strip all functionality that is not strictly form related such as displaying or receiving data to and from form inputs-->
 
 <div *ngFor="let model of modelArray" style="display: inline-block">
-    <paper-button class="del" *ngIf="model !== modelArray[0] && model === modelArray[modelArray.length - 1]" (click)="deleteFromQuery(model)">-</paper-button>
+
+    <paper-button [ngClass]="model === modelArray[0] ? 'clr' : 'del'" *ngIf="model === modelArray[modelArray.length - 1] && modelArray[modelArray.length - 1].isActive === true"
+        (click)="clearForm(model);">{{model === modelArray[0] ? 'Clear' : '-'}}</paper-button>
 
     <paper-input label="Clause" *ngIf="model === modelArray[0]" disabled [value]="model.sqlClause" style="width: 6em; margin-left: .8em; margin-right: .8em; display: inline-block;">
     </paper-input>
@@ -13,7 +15,7 @@
 
 
     <vaadin-combo-box [disabled]='!model.isActive' label="Select a Field" style="width: 286px; margin-left: .8em; margin-right: .8em; display: inline-block;"
-        [items]="entityProperties" item-label-path="displayName" item-value-path="property" [(value)]="model.field" (selected-item-changed)="propertyDataType = $event.detail.value?.dataType; getOperators()">
+        [items]="entityProperties" item-label-path="DisplayName" item-value-path="Property" [(value)]="model.field" (selected-item-changed)="model.dataType = $event.detail.value?.DataType; Enum = $event.detail.value.Enum; getOperators(model)">
         <paper-icon-button icon="remove-circle" class="clear-button"></paper-icon-button>
     </vaadin-combo-box>
 
@@ -23,18 +25,27 @@
         <paper-icon-button icon="remove-circle" class="clear-button"></paper-icon-button>
     </vaadin-combo-box>
 
-    <div [ngSwitch]="propertyDataType" style="display:inline-block">
+    <div [ngSwitch]="model.dataType" style="display:inline-block">
 
-        <vaadin-date-picker [disabled]='!model.isActive' *ngSwitchCase=" 'DateTime' " style="width: 370px; margin-left: .8em; margin-right: .8em;"
-            label="Date" [(value)]="model.condition"></vaadin-date-picker>
+        <vaadin-date-picker *ngSwitchCase=" 'DateTime' " [attr.readonly]="!model.comparisonOperator || null" [disabled]='!model.isActive'
+            [(value)]="model.condition" label="Date" style="width: 370px; margin-left: .8em; margin-right: .8em;"></vaadin-date-picker>
 
-        <paper-radio-group *ngSwitchCase=" 'Boolean' " allow-empty-selection [(selected)]="model.condition">
-            <paper-radio-button name="true">True</paper-radio-button>
-            <paper-radio-button name="false">False</paper-radio-button>
+        <!-- allow-empty-selection can be used on the control below-->
+        <paper-radio-group *ngSwitchCase=" 'Boolean' " [(selected)]="model.condition" style="width: 396px">
+            <paper-radio-button name="true" [attr.disabled]="(!model.comparisonOperator || !model.isActive) || null">True</paper-radio-button>
+            <paper-radio-button name="false" [attr.disabled]="(!model.comparisonOperator || !model.isActive) || null">False</paper-radio-button>
         </paper-radio-group>
 
-        <paper-input [disabled]='!model.isActive' *ngSwitchDefault [(value)]="model.condition" label="Condition" style="width: 370px; margin-left: .8em; margin-right: .8em;"></paper-input>
-        <!--The below SwichCase is unusable at the moment until further updates to the api and data-model allow time as an attribute
+        <vaadin-combo-box *ngSwitchCase=" 'Enum' " [attr.readonly]="!model.comparisonOperator || null" [disabled]='!model.isActive'
+            label="Options" [items]="enumMetaData?.EnumMembers" item-label-path="AdvancedDescriptor" item-value-path="Name" [(value)]="model.condition"
+            style="width: 370px; margin-left: .8em; margin-right: .8em; display: inline-block;">
+            <paper-icon-button icon="remove-circle" class="clear-button"></paper-icon-button>
+        </vaadin-combo-box>
+
+        <paper-input *ngSwitchDefault [attr.readonly]="!model.comparisonOperator || null" [disabled]='!model.isActive' [(value)]="model.condition"
+            label="Condition" style="width: 370px; margin-left: .8em; margin-right: .8em;"></paper-input>
+
+        <!--The below SwichCase is unusable at the moment until further updates to the api and data-model allow for time as an attribute
             to identify datetime properties explicitly as time or date-->
         <!--<div *ngSwitchCase=" 'DateTime' ">
             <paper-input [disabled]='!model.isActive' (focus)="openDialog(model)" [value]="model.condition" label="Time" style="width: 370px; margin-left: .8em; margin-right: .8em;">
@@ -49,15 +60,16 @@
                 </div>
             </paper-dialog>
         </div>-->
+
     </div>
-    <paper-button class="exe" *ngIf="model === modelArray[modelArray.length - 1]" (click)="addToQuery(model)">+</paper-button>
-    <paper-button class="clr" *ngIf="model === modelArray[modelArray.length - 1]" (click)="clearForm(model); ">Clear</paper-button>
+    <paper-button class="exe" *ngIf="model === modelArray[modelArray.length - 1] && modelArray[modelArray.length - 1].isActive === true"
+        (click)="addToQuery(model);">+</paper-button>
+</div>
+<hr style="margin: 24px 0px 32px;" />
+
+<div>
+    <paper-button [ngClass]="{'exe': !submitted, 'del': submitted}" (click)="submitQuery()" style="position: relativee; left: 80%;"
+        >{{submitted ? 'Go Back' : 'Submit'}}</paper-button>
 </div>
 
-
-<hr style="margin: 24px; 0px;" />
-
-<paper-button class="exe" (click)="submitQuery()">Submit</paper-button>
-
-
-<h4>{{testString}}</h4>
+<h4 style="margin-top: 16px;">{{testString}}</h4>

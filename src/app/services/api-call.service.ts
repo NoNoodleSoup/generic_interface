@@ -12,13 +12,18 @@ export class ApiCallService {
   'http://localhost:50657/api/'
   //'http://ntserver2:8085/api/'
 
-  getContext(details: boolean = false): Observable<Response> {
+  getContextMetaData(): Observable<Response> {
     return this.http.get(this.apiBaseUrl + 'MetaData/GetContextMetaData')
       .catch(this.handleError);
   }
 
-  getEntityMetaData(entity: string): Observable<Response> {
-    return this.http.get(this.apiBaseUrl + 'MetaData/GetEntityMetaData/' + entity)
+  getEntityMetaData(entityName: string): Observable<Response> {
+    return this.http.get(this.apiBaseUrl + 'MetaData/GetEntityMetaData/' + entityName)
+      .catch(this.handleError);
+  }
+
+  getEnumMetaData(enumName: string): Observable<Response> {
+    return this.http.get(this.apiBaseUrl + 'MetaData/GetEnumMetadata/' + enumName)
       .catch(this.handleError);
   }
 
